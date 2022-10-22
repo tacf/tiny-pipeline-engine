@@ -1,0 +1,16 @@
+name: TPE Lint & Build
+run-name: Validate 
+on: [push]
+jobs:
+  Linting:
+    runs-on: ubuntu-latest
+    steps:
+      - run: make lint
+  Build-Engine:
+    runs-on: ubuntu-latest
+    steps:
+      - run: make build
+  Build-Sample-Plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - run: make build-plugins

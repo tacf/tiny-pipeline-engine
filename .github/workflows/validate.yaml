@@ -1,8 +1,0 @@
-name: TPE Lint & Build
-run-name: Validate 
-on: [push]
-jobs:
-  Validate:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "make all"
