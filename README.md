@@ -1,4 +1,4 @@
-GH Action Status: ![Workflow Badge](https://github.com/tacf/tiny-pipeline-engine/actions/workflows/tpe_lint_build.yaml/badge.svg)
+![Workflow Badge](https://github.com/tacf/tiny-pipeline-engine/actions/workflows/tpe_lint_build.yaml/badge.svg)
 # Tiny Pipeline Engine
 
 Tiny Pipeline Engine (TPE) is a PoC of creating a simple workflow/pipeline engine with dynamically loaded tasks/functions using Go Plugins
