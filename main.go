@@ -91,18 +91,12 @@ func executePlugins(tasks ExecutableTasks) {
 func main() {
 	pipelineYaml := pipelineYaml.LoadYaml("./pipeline.yaml")
 
-	// Plugin loader operations
-
-	// Locate libs in plugin folder ('.so' files)
-	pluginFiles := locatePluginsFile("./bin/plugins/")
-
-	// Load Plugins
-	plugins := loadPlugins(pluginFiles)
-
-	// Pipeline execution operations
+	// Locate and load libs in plugin folder ('.so' files)
+	plugins := loadPlugins(locatePluginsFile("./bin/plugins/"))
 
 	// Load Tasks
 	executableTasks := loadTasks(plugins, pipelineYaml.Tasks)
 
+	// Execute the YAML workflow
 	executePlugins(executableTasks)
 }
