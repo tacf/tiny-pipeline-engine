@@ -9,12 +9,16 @@ import (
 	"strings"
 
 	"github.com/tacf/tiny-pipeline-engine/pipelineYaml"
-	"github.com/tacf/tiny-pipeline-engine/types"
 )
+
+type Plugin interface {
+	Exec()
+	GetName() string
+}
 
 type Arguments = map[string]string
 type PluginLibs = map[string]func(Arguments) interface{}
-type ExecutableTasks = []types.Plugin
+type ExecutableTasks = []Plugin
 
 func check(e error) {
 	if e != nil {
@@ -45,7 +49,7 @@ func instanciateTasks(pluginLibs PluginLibs, tasks pipelineYaml.TasksYaml) Execu
 		if !found {
 			panic(fmt.Sprintf("Unable to locate specified Plugin Library '%s'", v.Name))
 		}
-		executableTasks[i] = pluginLib(v.Parameters).(types.Plugin)
+		executableTasks[i] = pluginLib(v.Parameters).(Plugin)
 		fmt.Printf("[engine] New  plugin <%s> instance created\n", strings.ToLower(v.Name))
 		i++
 	}

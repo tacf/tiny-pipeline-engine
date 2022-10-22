@@ -7,11 +7,11 @@ import (
 
 var Name string = "Plugin2"
 
-type plugin struct {
+type task struct {
 	Parameters map[string]string
 }
 
-func (p plugin) Exec() {
+func (p task) Exec() {
 	fmt.Println("Plugin2 Exec() - Executing shell command")
 	shell := "bash"
 
@@ -27,8 +27,12 @@ func (p plugin) Exec() {
 	fmt.Println(string(stdout))
 }
 
+func (task) GetName() string {
+	return Name
+}
+
 func NewInstance(parameters map[string]string) interface{} {
-	return plugin{
+	return task{
 		Parameters: parameters,
 	}
 }
