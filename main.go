@@ -6,39 +6,21 @@ import (
 	"log"
 	"path/filepath"
 	"plugin"
+	"strings"
 
 	"github.com/tacf/tiny-pipeline-engine/pipelineYaml"
 	"github.com/tacf/tiny-pipeline-engine/types"
 )
 
-type Plugins = map[string]types.Plugin
-type ExecutableTasks = []struct {
-	types.Plugin
-	pipelineYaml.TaskYaml
-}
+type Arguments = map[string]string
+type PluginLibs = map[string]func(Arguments) interface{}
+type ExecutableTasks = []types.Plugin
 
 func check(e error) {
 	if e != nil {
-		log.Fatalf("error: %v", e)
+		log.Fatalf("[ERROR][engine]: %v", e)
 		panic(e)
 	}
-}
-
-func loadTasks(plugins Plugins, tasks pipelineYaml.TasksYaml) ExecutableTasks {
-	executableTasks := make(ExecutableTasks, len(tasks))
-	i := 0
-	for _, v := range tasks {
-		plugin, found := plugins[v.Name]
-		if !found {
-			panic(fmt.Sprintf("Unable to locate specified task '%s'", v.Name))
-		}
-		executableTasks[i] = struct {
-			types.Plugin
-			pipelineYaml.TaskYaml
-		}{plugin, v}
-		i++
-	}
-	return executableTasks
 }
 
 func locatePluginsFile(pluginBaseDir string) []string {
@@ -55,36 +37,48 @@ func locatePluginsFile(pluginBaseDir string) []string {
 	return filepaths
 }
 
-func loadPlugins(pluginPaths []string) Plugins {
-	plugs := Plugins{}
+func instanciateTasks(pluginLibs PluginLibs, tasks pipelineYaml.TasksYaml) ExecutableTasks {
+	executableTasks := make(ExecutableTasks, len(tasks))
+	i := 0
+	for _, v := range tasks {
+		pluginLib, found := pluginLibs[strings.ToLower(v.Name)]
+		if !found {
+			panic(fmt.Sprintf("Unable to locate specified Plugin Library '%s'", v.Name))
+		}
+		executableTasks[i] = pluginLib(v.Parameters).(types.Plugin)
+		fmt.Printf("[engine] New  plugin <%s> instance created\n", strings.ToLower(v.Name))
+		i++
+	}
+	return executableTasks
+}
+
+func loadPluginLibs(pluginPaths []string) PluginLibs {
+	plugLibs := PluginLibs{}
 	for _, path := range pluginPaths {
 		p, err := plugin.Open(path)
 		check(err)
 
-		GetPluginIface, err := p.Lookup("Initialize")
+		pluginName, err := p.Lookup("Name")
 		check(err)
 
-		pluginIface, err := GetPluginIface.(func() (interface{}, error))()
-		fmt.Printf("[engine] Loading plugin @ %s, err: %v\n", path, err)
+		pluginNewInstance, err := p.Lookup("NewInstance")
+		check(err)
 
-		plug, ok := pluginIface.(types.Plugin)
-		if !ok {
-			panic("[engine] Plugin loading failed due to 'Interface Implementation Error'")
-		}
-		fmt.Printf("[plugin %s] Loaded Plugin: %T %v\n", plug.GetName(), plug, plug)
+		pluginNewInstanceHandler := pluginNewInstance.(func(map[string]string) interface{})
 
-		plugs[plug.GetName()] = plug
+		pName := *pluginName.(*string)
+		plugLibs[strings.ToLower(pName)] = pluginNewInstanceHandler
+		fmt.Printf("[engine] Plugin Lib '%s' loaded\n", strings.ToLower(pName))
 	}
-	return plugs
+	return plugLibs
 }
 
-func executePlugins(tasks ExecutableTasks) {
-	for _, plugin := range tasks {
-		args := plugin.TaskYaml.Parameters
-		fmt.Printf("[engine] Running plugin: '%s'\n", plugin.GetName())
+func executeTasks(executableTasks ExecutableTasks) {
+	for _, executeTask := range executableTasks {
+		fmt.Printf("[engine] Running plugin: '%s'\n", executeTask.GetName())
 
 		// How do we handle exceptions here ? (Cross Language Exceptions)
-		plugin.Exec(args)
+		executeTask.Exec()
 	}
 }
 
@@ -92,11 +86,11 @@ func main() {
 	pipelineYaml := pipelineYaml.LoadYaml("./pipeline.yaml")
 
 	// Locate and load libs in plugin folder ('.so' files)
-	plugins := loadPlugins(locatePluginsFile("./bin/plugins/"))
+	pluginLibs := loadPluginLibs(locatePluginsFile("./bin/plugins/"))
 
 	// Load Tasks
-	executableTasks := loadTasks(plugins, pipelineYaml.Tasks)
+	executableTasks := instanciateTasks(pluginLibs, pipelineYaml.Tasks)
 
 	// Execute the YAML workflow
-	executePlugins(executableTasks)
+	executeTasks(executableTasks)
 }

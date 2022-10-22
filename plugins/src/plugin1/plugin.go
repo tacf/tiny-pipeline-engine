@@ -2,22 +2,19 @@ package main
 
 import "fmt"
 
-var Name string
+var Name string = "Plugin1"
 
-type plugin struct {}
-
-func (plugin) Exec(parameters map[string]string) {
-        fmt.Println("Plugin1 Exec()")
-        fmt.Println("Running Plugin1")
+type plugin struct {
+	Parameters map[string]string
 }
 
-func (plugin) GetName() string {
-        return Name
+func (plugin) Exec() {
+	fmt.Println("Plugin1 Exec()")
+	fmt.Println("Running Plugin1")
 }
 
-
-func Initialize() (f interface{}, err error) {
-        Name = "plugin1"
-        f = plugin{}
-        return
+func NewInstance(parameters map[string]string) interface{} {
+	return plugin{
+		Parameters: parameters,
+	}
 }
