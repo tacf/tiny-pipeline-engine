@@ -1,5 +1,5 @@
 name: TPE Lint & Build
-run-name: Validate 
+run-name: Lint & Build 
 on: [push]
 jobs:
   Linting:
