@@ -3,12 +3,12 @@
 
 Tiny Pipeline Engine (TPE) is a PoC of creating a simple workflow/pipeline engine with dynamically loaded tasks/functions using Go Plugins
 
-## Error Handling & Logging
+## Todo / Whishlist
+### Error Handling & Logging
 
 - Capture plugin stdout and print logs from engine
     - https://stackoverflow.com/questions/10473800/in-go-how-do-i-capture-stdout-of-a-function-into-a-string
 
-
-## Tests
+### Tests
 
 - Validate Plugin existence against Pipeline Yaml definition
