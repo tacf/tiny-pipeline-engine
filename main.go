@@ -7,22 +7,22 @@ import (
 	"path/filepath"
 	"plugin"
 
-	"tiagoacf.com/types"
 	"tiagoacf.com/pipelineYaml"
+	"tiagoacf.com/types"
 )
 
-
 type Plugins = map[string]types.Plugin
-type ExecutableTasks = []struct {types.Plugin; pipelineYaml.TaskYaml}
-
-
-func check(e error) {
-    if e != nil {
-		log.Fatalf("error: %v", e)
-        panic(e)
-    }
+type ExecutableTasks = []struct {
+	types.Plugin
+	pipelineYaml.TaskYaml
 }
 
+func check(e error) {
+	if e != nil {
+		log.Fatalf("error: %v", e)
+		panic(e)
+	}
+}
 
 func loadTasks(plugins Plugins, tasks pipelineYaml.TasksYaml) ExecutableTasks {
 	executableTasks := make(ExecutableTasks, len(tasks))
@@ -32,7 +32,10 @@ func loadTasks(plugins Plugins, tasks pipelineYaml.TasksYaml) ExecutableTasks {
 		if !found {
 			panic(fmt.Sprintf("Unable to locate specified task '%s'", v.Name))
 		}
-		executableTasks[i] = struct{types.Plugin; pipelineYaml.TaskYaml}{plugin, v}
+		executableTasks[i] = struct {
+			types.Plugin
+			pipelineYaml.TaskYaml
+		}{plugin, v}
 		i++
 	}
 	return executableTasks
@@ -40,7 +43,7 @@ func loadTasks(plugins Plugins, tasks pipelineYaml.TasksYaml) ExecutableTasks {
 
 func locatePluginsFile(pluginBaseDir string) []string {
 	var filepaths []string
-	filepath.WalkDir(pluginBaseDir, func(s string, d fs.DirEntry, e error) error {
+	check(filepath.WalkDir(pluginBaseDir, func(s string, d fs.DirEntry, e error) error {
 		if e != nil {
 			return e
 		}
@@ -48,7 +51,7 @@ func locatePluginsFile(pluginBaseDir string) []string {
 			filepaths = append(filepaths, s)
 		}
 		return nil
-	})
+	}))
 	return filepaths
 }
 
