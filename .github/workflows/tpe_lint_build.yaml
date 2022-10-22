@@ -7,7 +7,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - run: make lint
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
   Build-Engine:
     runs-on: ubuntu-latest
     steps:
