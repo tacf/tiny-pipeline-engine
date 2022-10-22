@@ -16,8 +16,7 @@ type Plugin interface {
 	GetName() string
 }
 
-type Arguments = map[string]string
-type PluginLibs = map[string]func(Arguments) interface{}
+type PluginLibs = map[string]func(map[string]string) interface{}
 type ExecutableTasks = []Plugin
 
 func check(e error) {
