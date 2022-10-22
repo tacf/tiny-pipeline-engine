@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"plugin"
 
-	"tiagoacf.com/pipelineYaml"
-	"tiagoacf.com/types"
+	"github.com/tacf/tiny-pipeline-engine/pipelineYaml"
+	"github.com/tacf/tiny-pipeline-engine/types"
 )
 
 type Plugins = map[string]types.Plugin

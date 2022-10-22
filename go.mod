@@ -1,4 +1,4 @@
-module tiagoacf.com
+module github.com/tacf/tiny-pipeline-engine
 
 go 1.18
 
