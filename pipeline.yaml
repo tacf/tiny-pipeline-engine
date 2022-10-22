@@ -1,0 +1,7 @@
+steps:
+  - task: plugin2
+    parameters:
+      command: "echo Hello World"
+  - task: plugin2
+    parameters:
+      command: "echo Hello Odd World"
