@@ -42,15 +42,13 @@ func locatePluginsFile(pluginBaseDir string) []string {
 
 func instanciateTasks(pluginLibs PluginLibs, tasks pipelineYaml.TasksYaml) ExecutableTasks {
 	executableTasks := make(ExecutableTasks, len(tasks))
-	i := 0
-	for _, v := range tasks {
+	for i, v := range tasks {
 		pluginLib, found := pluginLibs[strings.ToLower(v.Name)]
 		if !found {
 			panic(fmt.Sprintf("Unable to locate specified Plugin Library '%s'", v.Name))
 		}
 		executableTasks[i] = pluginLib(v.Parameters).(Plugin)
 		fmt.Printf("[engine] New  plugin <%s> instance created\n", strings.ToLower(v.Name))
-		i++
 	}
 	return executableTasks
 }
